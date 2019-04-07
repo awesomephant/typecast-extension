@@ -1,0 +1,11 @@
+{
+    "name": "gutenberg-extension",
+    "description": "",
+    "authors": "Max Kohler",
+    "version": "1.0.0",
+    "main": "pathToMain",
+    "dependencies": {
+        "npm": "^6.9.0",
+        "web-ext": "*"
+    }
+}
