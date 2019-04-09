@@ -1,6 +1,6 @@
 {
     "manifest_version": 2,
-    "name": "Borderify",
+    "name": "Gutenbergify",
     "version": "1.0",
     "description": "Adds a red border to all webpages matching mozilla.org.",
     "icons": {
@@ -8,7 +8,7 @@
     },
     "applications": {
         "gecko": {
-            "id": "borderify@example.com"
+            "id": "gutenbergify@example.com"
         }
     },
     "content_scripts": [
@@ -17,7 +17,7 @@
                 "<all_urls>"
             ],
             "js": [
-                "borderify.js"
+                "gutenbergify.js"
             ]
         }
     ]
