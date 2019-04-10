@@ -1,3 +1,4 @@
-node_modules
+node_modules/
 yarn-error.log
 package-lock.json
+wordlist-gutenberg-2.json

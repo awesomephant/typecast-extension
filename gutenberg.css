@@ -1,0 +1,16 @@
+iframe {
+    visibility: hidden;
+}
+
+* {
+    color: transparent !important;
+}
+
+.gutenberg-image {
+    margin: 0 !important;
+    margin-right: 2px !important;
+    display: inline-block;
+    width: auto !important;
+   /* filter: grayscale(1) contrast(1.2); */
+    mix-blend-mode: multiply;
+}
