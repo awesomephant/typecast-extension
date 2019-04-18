@@ -71,6 +71,7 @@ var globalProgress = 0;
 
 function updateProgress(i, n) {
     if (i){
+        let h1 = document.querySelector('.gutenberg--loading-screen h1')
         progressEl.innerHTML = `${i}/${n}`;
     }
 }
@@ -86,16 +87,20 @@ function replaceWords() {
     if (i < textElements.length) {
         let el = textElements[i];
         let words = el.innerText.split(' ');
-        let height = 40;
+        console.log(el)
+        let css = window.getComputedStyle(el);
+        let height = css.getPropertyValue('font-size');
+        height = height.substring(0, height.length - 2)
         el.innerText = '';
         for (let j = 0; j < words.length; j++) {
             if (words[j].length > 1) {
                 let closest = findClosestWord(words[j]);
                 let imgEl = document.createElement('img')
-                let version = gri(0, closest.count - 1)
+                let version = 0
+                //let version = gri(0, closest.count - 1)
                 let url = browser.runtime.getURL(`/word-images/${closest.text}-${version}.png`)
                 imgEl.setAttribute('src', url)
-                imgEl.setAttribute('height', height)
+                imgEl.setAttribute('style', `height: ${height * 1.5}px !important`)
                 imgEl.classList.add('gutenberg-image')
                 el.appendChild(imgEl)
             }
@@ -120,7 +125,7 @@ function replaceText(parent) {
             if (node.nodeName === '#text') {
                 let spanEl = document.createElement('span')
                 spanEl.innerText = node.data.trim()
-                spanEl.setAttribute('length', node.data)
+                spanEl.setAttribute('height', el.clientHeight)
                 spanEl.classList.add('GUTENBERG-text')
                 spanEl.style.display = 'inline'
                 el.appendChild(spanEl)

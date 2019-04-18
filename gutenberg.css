@@ -16,8 +16,9 @@ iframe {
     margin-right: 2px !important;
     display: inline-block;
     width: auto !important;
-    filter: grayscale(1) contrast(1.3) brightness(1);
+    filter: grayscale(0) contrast(1.2) brightness(1);
     mix-blend-mode: multiply;
+
 }
 
 @keyframes bounce {
