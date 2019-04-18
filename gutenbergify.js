@@ -1,6 +1,3 @@
-const baseURL = 'http://avh-sammlung.de/max/word-images/gutenberg-2'
-const testPath = '/word-images/gutenberg-2/ut-0.png'
-
 const source = {
     id: 'gutenberg'
 }
@@ -13,7 +10,7 @@ const gri = function (min, max) {
 
 const loadJSON = function (source, callback) {
     console.log('Loading wordlist..')
-    let url = browser.runtime.getURL('wordlist-gutenberg-2.json')
+    let url = browser.runtime.getURL('wordlist-gutenberg.json')
     var xobj = new XMLHttpRequest();
     xobj.overrideMimeType("application/json");
     xobj.open('GET', url, true);
@@ -57,7 +54,6 @@ const hasSmallAscender = function (word) {
 const findClosestWord = function (word) {
     let dmin = 99999;
     let closest;
-    console.log(wordList.length)
     for (let i = 0; i < wordList.length; i++) {
         let l = new Levenshtein(word, wordList[i].text.toString())
         if (l.distance < dmin) {
@@ -70,9 +66,52 @@ const findClosestWord = function (word) {
 
 
 
+var progressEl;
+var globalProgress = 0;
+
+function updateProgress(i, n) {
+    if (i){
+        progressEl.innerHTML = `${i}/${n}`;
+    }
+}
+
+var i = 0;
+var j = 0;
+var replaceLoop;
+var textElements
+
+function replaceWords() {
+    //console.log(`Replacing element ${i}, word ${j}`)
+    updateProgress(i, textElements.length)
+    if (i < textElements.length) {
+        let el = textElements[i];
+        let words = el.innerText.split(' ');
+        let height = 40;
+        el.innerText = '';
+        for (let j = 0; j < words.length; j++) {
+            if (words[j].length > 1) {
+                let closest = findClosestWord(words[j]);
+                let imgEl = document.createElement('img')
+                let version = gri(0, closest.count - 1)
+                let url = browser.runtime.getURL(`/word-images/${closest.text}-${version}.png`)
+                imgEl.setAttribute('src', url)
+                imgEl.setAttribute('height', height)
+                imgEl.classList.add('gutenberg-image')
+                el.appendChild(imgEl)
+            }
+        }
+        i++;
+        requestAnimationFrame(replaceWords)
+    } else {
+        document.body.setAttribute('gutenberg-done', 'true')
+    }
+}
+
+
 function replaceText(parent) {
     console.log('Replacing words..')
     let allElements = parent.querySelectorAll(`*`)
+    console.log(allElements)
     // First, let's make sure that ever bit of text is contained inside an element
     for (let i = 0; i < allElements.length; i++) {
         let el = allElements[i];
@@ -80,7 +119,8 @@ function replaceText(parent) {
             let node = el.childNodes[j];
             if (node.nodeName === '#text') {
                 let spanEl = document.createElement('span')
-                spanEl.innerText = node.data
+                spanEl.innerText = node.data.trim()
+                spanEl.setAttribute('length', node.data)
                 spanEl.classList.add('GUTENBERG-text')
                 spanEl.style.display = 'inline'
                 el.appendChild(spanEl)
@@ -88,31 +128,26 @@ function replaceText(parent) {
             }
         }
     }
-
-    let textElements = document.querySelectorAll('.GUTENBERG-text')
-    for (let i = 0; i < textElements.length; i++) {
-        let el = textElements[i];
-        let words = el.innerText.split(' ');
-        let height = 50;
-        el.innerText = ''
-        for (let j = 0; j < words.length; j++) {
-            if (words[j].length > 1) {
-                let closest = findClosestWord(words[j]);
-                let imgEl = document.createElement('img')
-                imgEl.setAttribute('src', `${baseURL}/${closest.text}-0.png`)
-                imgEl.setAttribute('height', height)
-                imgEl.classList.add('gutenberg-image')
-                el.appendChild(imgEl)
-            }
-        }
-    }
-
-    document.body.setAttribute('gutenberg-done', 'true')
+    textElements = document.querySelectorAll('.GUTENBERG-text');
+    requestAnimationFrame(replaceWords)
 }
+
+let loadingScreen = document.createElement('div');
+loadingScreen.classList.add('gutenberg--loading-screen')
+loadingScreen.innerHTML = `<h1><i>L</i><i>o</i><i>a</i><i>d</i><i>i</i><i>n</i><i>g</i></h1>`
+document.body.appendChild(loadingScreen)
+
+progressEl = document.createElement('div')
+progressEl.classList.add('gutenberg--progress')
+loadingScreen.appendChild(progressEl)
 
 loadJSON(source, function (data) {
     wordList = JSON.parse(data);
     let active = document.body.getAttribute('gutenberg-done')
+    window.setInterval(function () {
+        updateProgress(globalProgress)
+    }, 100)
+
     if (active != 'true') {
         replaceText(document.querySelector('body'));
     }

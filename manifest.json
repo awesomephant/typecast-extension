@@ -21,7 +21,7 @@
             ],
             "js": [
                 "levenshtein.js",
-                "wordlist-gutenberg-2.json",
+                "wordlist-gutenberg.json",
                 "gutenbergify.js"
             ]
         }
